@@ -1,0 +1,31 @@
+// var (
+// 	// Universal markup builders.
+// 	menu     = &tele.ReplyMarkup{}
+// 	selector = &tele.ReplyMarkup{}
+
+// 	scheduleHourlyBtn = selector.Data("hourly", "schedule", "@hourly")
+// 	scheduleDailyBtn  = selector.Data("daily", "schedule", "@daily")
+// 	scheduleWeeklyBtn = selector.Data("weekly", "schedule", "@weekly")
+// )
+
+// menu.Inline(menu.Row(scheduleWeeklyBtn, scheduleDailyBtn, scheduleHourlyBtn))
+// b.Handle("/star", func(c tele.Context) error {
+// 	return c.Send("Hello!", menu)
+// })
+
+// On inline button pressed (callback)
+// b.Handle(tele.OnCallback, func(c tele.Context) error {
+// 	fmt.Println(c.Data())
+
+// 	callback := strings.TrimSpace(strings.Split(c.Data(), "|")[0])
+
+// 	fmt.Printf("[DEBUG] /callback %s message received\n", callback)
+
+// 	if callback == "schedule" {
+// 		value := strings.TrimSpace(strings.Split(c.Data(), "|")[1])
+
+// 		fmt.Printf("Handling schedule message %s", value)
+// 	}
+
+// 	return c.Respond(&tele.CallbackResponse{Text: "Schedule configured!"})
+// })
