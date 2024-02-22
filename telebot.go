@@ -18,7 +18,6 @@ var HelpText = "Welcome!\n\n" +
 	"/stop - Stop the bot\n" +
 	"/restart - Restart the bot\n" +
 	"/setcron - The frequency the bot checks for updates in a cron expression format\nexample: ```/setcron 0 12/24 * * *```\nTo understand cron expressions visit: https://crontab.guru/\n" +
-	// "/setschedule - The frequency the bot checks for updates\nexample: ```/setschedule 2h```\n" +
 	"/addrifs - Add RIF identifiers to search by: \nexample: ```/addrifs G200003391,G200038179```\n" +
 	"/removerifs - Remove RIF identifiers to search by: \nexample: ```/removerifs G200003391,G200038179```\n" +
 	"/addkeywords - Add keywords to search by: \nexample: ```/addkeywords PETRO,GAS,TUBERIA```\n" +
@@ -48,14 +47,27 @@ func sendContractReport(b *tele.Bot, c tele.Context) {
 	var err error
 	var contracts []Contract
 
+	sendToChats := func(message string) {
+		chatids := GetWhiteListedChatIds()
+
+		for _, ID := range chatids {
+			_, err = b.Send(&tele.Chat{ID: ID}, message)
+
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+	}
+
 	contracts, err = ScrapContracts()
 
 	if err != nil {
-		_, err = b.Send(&tele.Chat{ID: c.Chat().ID}, fmt.Sprintf("Error while fetching table. %s", err))
+		sendToChats(fmt.Sprintf("Error while fetching table. %s", err))
+		// _, err = b.Send(&tele.Chat{ID: c.Chat().ID}, fmt.Sprintf("Error while fetching table. %s", err))
 
-		if err != nil {
-			log.Fatal(err)
-		}
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
 	}
 
 	filteredContracts := []Contract{}
@@ -82,11 +94,7 @@ func sendContractReport(b *tele.Bot, c tele.Context) {
 	}
 
 	for _, contract := range filteredContracts {
-		_, err = b.Send(&tele.Chat{ID: c.Chat().ID}, contract.HumanReadable())
-
-		if err != nil {
-			log.Fatal(err)
-		}
+		sendToChats(contract.HumanReadable())
 	}
 
 	Config.UpdateFromDate()
@@ -135,26 +143,6 @@ func StartTelebot() {
 
 		return c.Send(fmt.Sprintf("Current cron [%s]", Config.crontab))
 	})
-
-	// b.Handle("/setschedule", func(c tele.Context) error {
-	// 	args := strings.Fields(c.Message().Text)
-
-	// 	if len(args) < 2 {
-	// 		return c.Send("Argument required!\nexample: ```/setschedule 2h```")
-	// 	}
-
-	// 	duration, err := time.ParseDuration(args[1])
-
-	// 	if err != nil {
-	// 		return c.Send("Parsing error, check your argument!")
-	// 	}
-
-	// 	Config.schedule.update(duration)
-
-	// 	fmt.Printf("[DEBUG] /setschedule using interval: %s", Config.schedule.String())
-
-	// 	return c.Send(fmt.Sprintf("Successful schedule set [%s]", Config.schedule))
-	// })
 
 	b.Handle("/addrifs", func(c tele.Context) error {
 		args := strings.Fields(c.Message().Text)

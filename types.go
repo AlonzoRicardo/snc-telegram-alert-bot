@@ -108,13 +108,8 @@ var Config = Configuration{
 
 type ChatID int64
 
-func (uid ChatID) int64() int64 {
-	return int64(uid)
-}
-
-func (uid ChatID) isValid() bool {
+func GetWhiteListedChatIds() []int64 {
 	groupIdsStr := os.Getenv("CHAT_IDS")
-
 	groupIdsStrs := strings.Split(groupIdsStr, ",")
 
 	// Create a slice to store the parsed numbers
@@ -131,6 +126,16 @@ func (uid ChatID) isValid() bool {
 
 		groupIds = append(groupIds, num)
 	}
+
+	return groupIds
+}
+
+func (uid ChatID) int64() int64 {
+	return int64(uid)
+}
+
+func (uid ChatID) isValid() bool {
+	groupIds := GetWhiteListedChatIds()
 
 	var whitelisted = false
 
